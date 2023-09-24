@@ -25,18 +25,19 @@ export default {
   async scheduled(event, env, ctx) {
     async function cron() {
       const webhookURL = env.url;
-      const message = "Total Downloads for this week: " + await KV.get("total");
+      const message =
+        "Total Downloads for this week: " + (await KV.get("total"));
       fetch(webhookURL, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          content: message
-        })
+          content: message,
+        }),
       })
-      .then(response => console.log(response))
-      .catch(error => console.error(error));
+        .then((response) => console.log(response))
+        .catch((error) => console.error(error));
       await KV.put("total", 0);
     }
     ctx.waitUntil(cron());
