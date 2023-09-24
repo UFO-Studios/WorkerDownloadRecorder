@@ -16,8 +16,29 @@ export default {
       await KV.put(recordedUrl, count + 1);
       console.log(recordedUrl + "updated in KV");
     }
+    let oldTotal = await KV.get("total");
+    await KV.put("total", oldTotal + 1);
 
     // Redirect the user to the recorded URL.
     return new Response.redirect(recordedUrl, 301);
+  },
+  async scheduled(event, env, ctx) {
+    async function cron() {
+      const webhookURL = env.url;
+      const message = "Total Downloads for this week: " + await KV.get("total");
+      fetch(webhookURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          content: message
+        })
+      })
+      .then(response => console.log(response))
+      .catch(error => console.error(error));
+      await KV.put("total", 0);
+    }
+    ctx.waitUntil(cron());
   },
 };

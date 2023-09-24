@@ -5,3 +5,6 @@ compatibility_date = "2023-09-24"
 kv_namespaces = [
   { binding = "KV", id = "c25ceddd69d046ffb315f74ed1f3de33" }
 ]
+
+[triggers]
+crons = ["0 12 * * sat"]
