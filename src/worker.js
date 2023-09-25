@@ -7,7 +7,7 @@ export default {
     }
     const KV = env.KV;
     console.log(url);
-    const packName = url.split("/reder?url=")[1];
+    const packName = url.split("/reder?url=")[1]; //pack name will include username, e.g niceygylive/example
     //var packName = "";
     
     console.log(packName);
@@ -31,9 +31,10 @@ export default {
     await KV.put("total", oldTotal*1+1);
 
     // Redirect the user to the recorded URL.
-    return await Response.redirect("https://github.com/thealiendocotor/"+packName+"/releases", 301, {
+    return await Response.redirect("https://github.com/"+packName+"/releases", 301, {
       headers: {
-        "Cache-Control": "no-cache"
+        //"Cache-Control": "no-cache",
+        "Cache-Control": "no-store"
       }
     });
   },
