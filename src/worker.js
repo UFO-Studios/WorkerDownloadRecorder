@@ -1,26 +1,40 @@
 export default {
   async fetch(request, env, ctx) {
+    console.log("Worker is running...")
     const url = request.url;
+    if (url.includes("favicon.ico")) {
+      return new Response(null, { status: 404 });
+    }
+    const KV = env.KV;
     console.log(url);
     const splitURL = url.split("/reder?url=")[1];
-    var recordedUrl = splitURL.replace("https://github.com/thealiendoctor", "");
-    var recordedUrl = recordedUrl.replace("releases/download", "");
+    var recordedUrl = "";
+    if (splitURL) {
+      recordedUrl = splitURL.replace("https://github.com/thealiendoctor", "");
+      recordedUrl = recordedUrl.replace("releases/download", "");
+    }
     console.log(recordedUrl);
 
+    var oldNum = await KV.get(recordedUrl);
     // Record the URL if it is not already recorded in the Worker's storage.
-    if (!recordedUrl) {
+    if (oldNum / oldNum != 1) {
+      console.log("Not found in KV")
       await KV.put(recordedUrl, 1);
-      console.log(recordedUrl + "added to KV");
+      console.log(recordedUrl + " added to KV");
     } else {
-      let count = await KV.get(recordedUrl);
-      await KV.put(recordedUrl, count + 1);
-      console.log(recordedUrl + "updated in KV");
+      console.log("Found in KV")
+      var newCount = oldNum*1+1;
+      //var newCount = oldNum + 1;
+      console.log(recordedUrl + " has " + newCount + " downloads");
+      await KV.put(recordedUrl, newCount);
+      console.log(recordedUrl + " updated in KV");
     }
+
     let oldTotal = await KV.get("total");
-    await KV.put("total", oldTotal + 1);
+    await KV.put("total", oldTotal*1+1);
 
     // Redirect the user to the recorded URL.
-    return new Response.redirect(recordedUrl, 301);
+    return new /*Response("Hello world " + recordedUrl)*/  Response.redirect("https://"+recordedUrl, 301);
   },
   async scheduled(event, env, ctx) {
     async function cron() {
