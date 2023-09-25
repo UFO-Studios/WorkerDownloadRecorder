@@ -7,34 +7,35 @@ export default {
     }
     const KV = env.KV;
     console.log(url);
-    const splitURL = url.split("/reder?url=")[1];
-    var recordedUrl = "";
-    if (splitURL) {
-      recordedUrl = splitURL.replace("https://github.com/thealiendoctor", "");
-      recordedUrl = recordedUrl.replace("releases/download", "");
-    }
-    console.log(recordedUrl);
+    const packName = url.split("/reder?url=")[1];
+    //var packName = "";
+    
+    console.log(packName);
 
-    var oldNum = await KV.get(recordedUrl);
+    var oldNum = await KV.get(packName);
     // Record the URL if it is not already recorded in the Worker's storage.
     if (oldNum / oldNum != 1) {
       console.log("Not found in KV")
-      await KV.put(recordedUrl, 1);
-      console.log(recordedUrl + " added to KV");
+      await KV.put(packName, 1);
+      console.log(packName + " added to KV");
     } else {
       console.log("Found in KV")
       var newCount = oldNum*1+1;
       //var newCount = oldNum + 1;
-      console.log(recordedUrl + " has " + newCount + " downloads");
-      await KV.put(recordedUrl, newCount);
-      console.log(recordedUrl + " updated in KV");
+      console.log(packName + " has " + newCount + " downloads");
+      await KV.put(packName, newCount);
+      console.log(packName + " updated in KV");
     }
 
     let oldTotal = await KV.get("total");
     await KV.put("total", oldTotal*1+1);
 
     // Redirect the user to the recorded URL.
-    return /*new Response("Hello world " + recordedUrl)*/  Response.redirect("https://"+recordedUrl, 301);
+    return await Response.redirect("https://github.com/thealiendocotor/"+packName+"/releases", 301, {
+      headers: {
+        "Cache-Control": "no-cache"
+      }
+    });
   },
   async scheduled(event, env, ctx) {
     async function cron() {
