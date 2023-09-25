@@ -34,7 +34,7 @@ export default {
     await KV.put("total", oldTotal*1+1);
 
     // Redirect the user to the recorded URL.
-    return new /*Response("Hello world " + recordedUrl)*/  Response.redirect("https://"+recordedUrl, 301);
+    return /*new Response("Hello world " + recordedUrl)*/  Response.redirect("https://"+recordedUrl, 301);
   },
   async scheduled(event, env, ctx) {
     async function cron() {
