@@ -44,33 +44,31 @@ export default {
       return new Response(null, { status: 404 });
     }
     const KV = env.KV;
-    console.log(url);
-    const packName = url.split("/reder?url=")[1]; //pack name will include username, e.g niceygylive/example
+    console.log("Handling request for " + url);
+    const packNameRaw = url.split("/reder?url=")[1]; //pack name will include username, e.g niceygylive/example
     const fileName = url.split("?file=")[1]; //e.g V1.1.2/download.zip
-
-    console.log(packName);
+    const packName = packNameRaw.split("?file=")[0]; //e.g niceygylive/example
+    console.log("Parsed! Pack name is " + packName + " and file name is " + fileName);
 
     var oldNum = await KV.get(packName);
-    // Record the URL if it is not already recorded in the Worker's storage.
     if (oldNum / oldNum != 1) {
-      console.log("Not found in KV");
+      console.log("Repo not found in KV");
       await KV.put(packName, 1);
       console.log(packName + " added to KV");
     } else {
       console.log("Found in KV");
       var newCount = oldNum * 1 + 1;
-      //var newCount = oldNum + 1;
-      console.log(packName + " has " + newCount + " downloads");
       await KV.put(packName, newCount);
-      console.log(packName + " updated in KV");
+      console.log(packName + " now has " + newCount + " downloads");
     }
 
     let oldTotal = await KV.get("total");
     await KV.put("total", oldTotal * 1 + 1);
 
     // Redirect the user to the recorded URL.
+    console.log("Redirecting the user to https://github.com/" + packName + "/releases/download/" + fileName)
     return await Response.redirect(
-      "https://github.com/" + packName + "/releases/download" + fileName,
+      "https://github.com/" + packName + "/releases/download/" + fileName,
       301,
       {
         headers: {
