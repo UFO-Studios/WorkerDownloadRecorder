@@ -47,7 +47,14 @@ export default {
     console.log("Handling request for " + url);
     const packNameRaw = url.split("/reder?url=")[1]; //pack name will include username, e.g niceygylive/example
     const fileName = url.split("?file=")[1]; //e.g V1.1.2/download.zip
-    const packName = packNameRaw.split("?file=")[0]; //e.g niceygylive/example
+    var packName = packNameRaw.split("?file=")[0]; //e.g niceygylive/example
+    if (packName == undefined | fileName == undefined) {
+      console.log("Invalid request, redirecting to 404")
+      await response.redirect(
+      "https://thealiendoctor.com/404", 301
+      );
+
+    }
     console.log("Parsed! Pack name is " + packName + " and file name is " + fileName);
 
     var oldNum = await KV.get(packName);
