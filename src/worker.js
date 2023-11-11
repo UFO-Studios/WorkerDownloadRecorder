@@ -3,6 +3,7 @@ async function cron(env) {
   const KV = env.KV;
   const webhookURL = env.url;
   var repos = [];
+  
   const list = await KV.list();
   console.log("Key list aquired");
   for (const { name, expiration } of list.keys) {
@@ -15,7 +16,9 @@ async function cron(env) {
     }
   }
   repos.sort((a, b) => b.count - a.count); // Sort repos by count in descending order
-  var message = repos.map(repo => `Repo: ${repo.name}, Count: ${repo.count}\n`).join("");
+  let currentDate = new Date();
+  var message = "# Downloads as of " + currentDate.toUTCString() + "\n\n";
+  var message =+ repos.map(repo => `Repo: ${repo.name}, Count: ${repo.count}\n`).join("");
   console.log("Message generated. Sending to Discord...");
   console.log(message);
   
