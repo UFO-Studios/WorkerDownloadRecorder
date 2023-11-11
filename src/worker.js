@@ -31,18 +31,24 @@ async function cron(env) {
     .then((response) => console.log(response))
     .catch((error) => console.error(error));
   console.log("Message sent to Discord");
-  return "complete";
+  return "complete\n";
 }
-
 
 
 export default {
   async fetch(request, env, ctx) {
     console.log("Worker is running...");
+    console.log("Processing request for " + request.url)
     const url = request.url;
     if (url.includes("testCron")) { console.log("testing cron func"); return new Response(await cron(env));}
     if (url.includes("favicon.ico")) {
       return new Response(null, { status: 404 });
+    }
+    if (url.length < 1 | url == undefined | url == "http://127.0.0.1:8787/") {
+      console.log("Invalid request, redirecting to 404")
+      return await response.redirect(
+      "https://thealiendoctor.com/404", 301
+      );
     }
     const KV = env.KV;
     console.log("Handling request for " + url);
@@ -51,7 +57,7 @@ export default {
     var packName = packNameRaw.split("?file=")[0]; //e.g niceygylive/example
     if (packName == undefined | fileName == undefined) {
       console.log("Invalid request, redirecting to 404")
-      await response.redirect(
+      return await response.redirect(
       "https://thealiendoctor.com/404", 301
       );
 
