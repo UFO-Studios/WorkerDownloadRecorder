@@ -2,8 +2,7 @@ async function cron(env) {
   console.log("Cron func is running...");
   const KV = env.KV;
   const webhookURL = env.url;
-  var message = ""
-  message += "\n\n";
+  var repos = [];
   const list = await KV.list();
   console.log("Key list aquired");
   for (const { name, expiration } of list.keys) {
@@ -12,9 +11,11 @@ async function cron(env) {
     if (name == "total" | name == undefined | name == "undefined") {
       console.log("Invalid Repo, skipping");
     } else {
-    message += (`Repo: ${name}, Count: ${value}\n`);
+      repos.push({ name: name, count: parseInt(value) });
     }
   }
+  repos.sort((a, b) => b.count - a.count); // Sort repos by count in descending order
+  var message = repos.map(repo => `Repo: ${repo.name}, Count: ${repo.count}\n`).join("");
   console.log("Message generated. Sending to Discord...");
   console.log(message);
   
@@ -30,7 +31,7 @@ async function cron(env) {
     .then((response) => console.log(response))
     .catch((error) => console.error(error));
   console.log("Message sent to Discord");
-  return "complete\n";
+  return "complete";
 }
 
 
