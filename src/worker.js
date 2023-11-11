@@ -17,8 +17,7 @@ async function cron(env) {
   }
   repos.sort((a, b) => b.count - a.count); // Sort repos by count in descending order
   let currentDate = new Date();
-  var message = "# Downloads as of " + currentDate.toUTCString() + "\n\n";
-  var message =+ repos.map(repo => `Repo: ${repo.name}, Count: ${repo.count}\n`).join("");
+  var message = "# Downloads as of " + currentDate.toUTCString() + "\n\n" + repos.map(repo => `Repo: ${repo.name}, Count: ${repo.count}\n`).join("");
   console.log("Message generated. Sending to Discord...");
   console.log(message);
   
