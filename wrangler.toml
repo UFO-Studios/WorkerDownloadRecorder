@@ -3,7 +3,8 @@ main = "src/worker.js"
 compatibility_date = "2023-09-24"
 
 kv_namespaces = [
-  { binding = "KV", id = "c25ceddd69d046ffb315f74ed1f3de33" }
+  { binding = "WDR", id = "c25ceddd69d046ffb315f74ed1f3de33" },
+  { binding = "WVR", id = "8946e1721893497689df9b9e99a5ded2" }
 ]
 
 [triggers]
