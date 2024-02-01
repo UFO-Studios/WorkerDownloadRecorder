@@ -52,6 +52,7 @@ async function cron(env, sendMsg) {
   pages.sort((a, b) => b.count - a.count); // Sort repos by count in descending order
   let currentDate = new Date();
 
+  //MESSAGE ########################################################################
   var message = "# Downloads as of " + currentDate.toUTCString() + "\n\n" + repos.map(repo => `Repo: ${repo.name}, Count: ${repo.count}\n`).join("");
   var message = message + "\n\nTotal downloads: " + Dtotal;
   var message = message + "\n\n# Page visits as of " + currentDate.toUTCString() + "\n\n" + pages.map(page => `Page: ${page.name}, Count: ${page.count}\n`).join("");
@@ -89,9 +90,9 @@ async function recordDownload(url, env) {
   print("Recording download");
   const KV = env.WDR;
   console.log("Handling request for " + url);
-  const packNameRaw = url.split("/reder?url=")[1]; //pack name will include username, e.g niceygylive/example
+  const packNameRaw = url.split("/reder?url=")[1]; //pack name will include username & file part of url, e.g niceygylive/example
   const fileName = url.split("?file=")[1]; //e.g V1.1.2/download.zip
-  var packName = packNameRaw.split("?file=")[0]; //e.g niceygylive/example
+  var packName = packNameRaw.split("?file=")[0]; //removes file part of url, leaving "niceygylive/example"
   if (packName == undefined | fileName == undefined) {
     console.log("Invalid request, redirecting to 404")
     return Response.redirect("https://thealiendoctor.com/404", 301);
@@ -164,7 +165,7 @@ export default {
       return await recordDownload(request, env);
     } else if (url.includes("?page=")) {
       console.log("Request is for a page.");
-      recordVisit(url, env);
+      return await recordVisit(url, env);
     } else {
       console.log("Invalid request, redirecting to 404");
       return Response.redirect("https://thealiendoctor.com/404", 301);
