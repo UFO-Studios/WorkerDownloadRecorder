@@ -17,7 +17,7 @@ async function cron(env, sendMsg) {
 
   const Dlist = await KV1.list();
   console.log("Key list aquired for downloads");
-  var total = 0;
+  var Dtotal = 0;
   var i = 0;
   var len = Dlist.keys.length;
   for (const { name, expiration } of Dlist.keys) {
@@ -27,7 +27,7 @@ async function cron(env, sendMsg) {
       console.log("Invalid Repo, skipping");
     } else {
       repos.push({ name: name, count: parseInt(value) });
-      total += parseInt(value);
+      Dtotal += parseInt(value);
     }
   }
   repos.sort((a, b) => b.count - a.count); // Sort repos by count in descending order
@@ -35,7 +35,7 @@ async function cron(env, sendMsg) {
 
   const Plist = await KV2.list();
   console.log("Key list aquired for pages");
-  var total = 0;
+  var Ptotal = 0;
   var i = 0;
   var len = Plist.keys.length;
   for (const { name, expiration } of Plist.keys) {
@@ -46,16 +46,16 @@ async function cron(env, sendMsg) {
       console.log("Invalid page, skipping");
     } else {
       pages.push({ name: name, count: parseInt(value) });
-      total += parseInt(value);
+      Ptotal += parseInt(value);
     }
   }
   pages.sort((a, b) => b.count - a.count); // Sort repos by count in descending order
   let currentDate = new Date();
 
   var message = "# Downloads as of " + currentDate.toUTCString() + "\n\n" + repos.map(repo => `Repo: ${repo.name}, Count: ${repo.count}\n`).join("");
-  var message = message + "\n\nTotal downloads: " + total;
+  var message = message + "\n\nTotal downloads: " + Dtotal;
   var message = message + "\n\n# Page visits as of " + currentDate.toUTCString() + "\n\n" + pages.map(page => `Page: ${page.name}, Count: ${page.count}\n`).join("");
-  var message = message + "\n\nTotal page visits: " + total;
+  var message = message + "\n\nTotal page visits: " + Ptotal;
   console.log("Message generated. Sending to Discord...");
   console.log(message);
 
