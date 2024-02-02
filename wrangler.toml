@@ -13,3 +13,5 @@ crons = ["0 12 * * sat"]
 [vars]
 url = "https://discord.com/api/webhooks/1156259064595087521/fLfxylc8D6oe15-ZsnTxhpjwUkmjUIXM08ncj0GYV2pX3yykMM3hMZgbRn36qsvhd9FG"
 
+[placement]
+mode = "smart"
