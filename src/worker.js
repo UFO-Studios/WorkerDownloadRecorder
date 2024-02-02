@@ -87,11 +87,11 @@ async function cron(env, sendMsg) {
  * @returns Error or redirect
  */
 async function recordDownload(url, env) {
-  print("Recording download");
+  console.log("Recording download");
   const KV = env.WDR;
   console.log("Handling request for " + url);
-  const packNameRaw = url.split("/reder?url=")[1]; //pack name will include username & file part of url, e.g niceygylive/example
-  const fileName = url.split("?file=")[1]; //e.g V1.1.2/download.zip
+  const packNameRaw = url.toString().split("/reder?url=")[1]; //pack name will include username & file part of url, e.g niceygylive/example
+  const fileName = url.toString().split("?file=")[1]; //e.g V1.1.2/download.zip
   var packName = packNameRaw.split("?file=")[0]; //removes file part of url, leaving "niceygylive/example"
   if (packName == undefined | fileName == undefined) {
     console.log("Invalid request, redirecting to 404")
@@ -162,7 +162,7 @@ export default {
     }
     if (url.includes("/reder?url=")) {
       console.log("Request is for a download.");
-      return await recordDownload(request, env);
+      return await recordDownload(request.url, env);
     } else if (url.includes("?page=")) {
       console.log("Request is for a page.");
       return await recordVisit(url, env);
