@@ -53,24 +53,44 @@ async function cron(env, sendMsg) {
   let currentDate = new Date();
 
   //MESSAGE ########################################################################
-  var message = "# Downloads as of " + currentDate.toUTCString() + "\n\n" + repos.map(repo => `Repo: ${repo.name}, Count: ${repo.count}\n`).join("");
-  var message = message + "\n\nTotal downloads: " + Dtotal;
-  var message = message + "\n\n# Page visits as of " + currentDate.toUTCString() + "\n\n" + pages.map(page => `Page: ${page.name}, Count: ${page.count}\n`).join("");
-  var message = message + "\n\nTotal page visits: " + Ptotal;
-  console.log("Message generated. Sending to Discord...");
-  console.log(message);
-
-  if (sendMsg == false) {
-    await fetch(webhookURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        content: message,
-      }),
-    })
-      .then((response) => console.log(response))
+  var message1 = "# Downloads as of " + currentDate.toUTCString() + "\n\n" + repos.map((repo) => `Repo: ${repo.name}, Count: ${repo.count}
+  `).join("");
+    var message1 = message1 + "\n\nTotal downloads: " + Dtotal;
+    var message2 = "# Page visits as of " + currentDate.toUTCString() + "\n\n" + pages.map((page) => `Page: ${page.name}, Count: ${page.count}
+  `).join("");
+    var message = message2 + "\n\nTotal page visits: " + Ptotal;
+    console.log("Message generated. Sending to Discord...");
+    console.log(message);
+    if (sendMsg == false) {
+      console.log("Sending data to " + env.url)
+      //split messages to avoid limit
+      await fetch(env.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          content: message1
+        })
+      }).then((response) => {
+        console.log('Status:', response.status);
+        // return response.text();
+      })
+      .then((body) => console.log('Body:', body))
+      .catch((error) => console.error(error));
+      await fetch(env.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          content: message2
+        })
+      }).then((response) => {
+        console.log('Status:', response.status);
+        // return response.text();
+      })
+      .then((body) => console.log('Body:', body))
       .catch((error) => console.error(error));
     console.log("Message sent to Discord");
     return "Complete! Message sent.";
