@@ -1,17 +1,37 @@
 name = "download_recorder"
 main = "src/worker.js"
 compatibility_date = "2023-09-24"
+workers_dev = true
 
-kv_namespaces = [
-  { binding = "WDR", id = "c25ceddd69d046ffb315f74ed1f3de33" },
-  { binding = "WVR", id = "8946e1721893497689df9b9e99a5ded2" }
-]
+[[routes]]
+pattern = "download.thealiendoctor.com"
+zone_name = "thealiendoctor.com"
+custom_domain = true
+
+[[routes]]
+pattern = "stats.thealiendoctor.com"
+zone_name = "thealiendoctor.com"
+custom_domain = true
+
+[placement]
+mode = "smart"
 
 [triggers]
-crons = ["0 12 * * sat"]
+crons = [ "0 12 * * sat" ]
+
+# [unsafe]
+#   [[unsafe.bindings]]
+#   database_id = "eafc6a3b-97a7-4c08-94d9-7a10d4c28cb0"
+#   name = "DB"
+#   type = "d1"
 
 [vars]
 url = "https://discord.com/api/webhooks/1156259064595087521/fLfxylc8D6oe15-ZsnTxhpjwUkmjUIXM08ncj0GYV2pX3yykMM3hMZgbRn36qsvhd9FG"
 
-[placement]
-mode = "smart"
+[[kv_namespaces]]
+id = "c25ceddd69d046ffb315f74ed1f3de33"
+binding = "WDR"
+
+[[kv_namespaces]]
+id = "8946e1721893497689df9b9e99a5ded2"
+binding = "WVR"
