@@ -179,11 +179,17 @@ var worker_default = {
 		if (url.includes('test/cron')) {
 			//Run cron tests manually, used for debug
 			return new Response(await cron(env, true, false));
-		}
-		if (url.includes('favicon.ico')) {
+		} else if (url.includes('favicon.ico')) {
 			//Ignore favicon requests
 			return new Response(null, { status: 404 });
-		}
+		} else if (url.includes('robots.txt')) {
+      //Ignore robots.txt requests
+      return new Response('User-agent: *\nDisallow: /', {
+        headers: {
+          'content-type': 'text/plain',
+        },
+      });
+    }
 		if (!url) {
 			//Ignore empty requests
 			console.log('Invalid request, redirecting to 404');
