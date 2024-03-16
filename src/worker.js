@@ -20,10 +20,21 @@ async function cron(env, sendMsg) {
 		i++;
 		console.log(`Getting value for ${name} (${i}/${len})`);
 		const value = await KV1.get(name);
-		if (!name || name == 'total' || name.toString().includes('%2F') || name.toString().includes('%3F') || name.toString().includes('%3D')) {
+		if (!name || name == 'total' || name.toString().includes('%2F') || name.toString().includes('%3F') || name.toString().includes('%3D') || name.toString().includes('?file=')) {
 			if (!name) {
 				console.log('Invalid Repo, skipping');
 			} else {
+				if (name.toString().includes('%2F') || name.toString().includes('%3F') || name.toString().includes('%3D')) {
+					//Fix invalid repo names
+					var newName = name.toString().replace('%2F', '/');
+					var newName = newName.replace('%3F', '?');
+					var newName = newName.replace('%3D', '=');
+					var newName = newName.split('?')[0]; //remove ?file=...
+					var lcount = await KV1.get(newName); //local count
+					await KV1.put(newName, lcount * 1 + value * 1); // *1 to convert to int
+					await KV1.delete(name);
+					console.log('Deleted invalid repo ' + name + ' and replaced with ' + newName);
+				}
 				await KV1.delete(name);
 				console.log('Invalid Repo, deleting');
 			}
@@ -51,27 +62,9 @@ async function cron(env, sendMsg) {
 	}
 	pages.sort((a, b) => b.count - a.count); //sort by count (high > low)
 	let currentDate = /* @__PURE__ */ new Date();
-	var message1 =
-		'# Downloads as of ' +
-		currentDate.toUTCString() +
-		'\n\n' +
-		repos
-			.map(
-				(repo) => `Repo: ${repo.name}, Count: ${repo.count}
-`
-			)
-			.join('');
+	var message1 = '# Downloads as of ' + currentDate.toUTCString() + '\n\n' + repos.map((repo) => `Repo: ${repo.name}, Count: ${repo.count}`).join('');
 	var message1 = message1 + '\n\nTotal downloads: ' + Dtotal;
-	var message2 =
-		'# Page visits as of ' +
-		currentDate.toUTCString() +
-		'\n\n' +
-		pages
-			.map(
-				(page) => `Page: ${page.name}, Count: ${page.count}
-`
-			)
-			.join('');
+	var message2 = '# Page visits as of ' + currentDate.toUTCString() + '\n\n' + pages.map((page) => `Page: ${page.name}, Count: ${page.count}`).join('');
 	var message = message2 + '\n\nTotal page visits: ' + Ptotal;
 	console.log('Message generated. Sending to Discord...');
 	console.log(message);
