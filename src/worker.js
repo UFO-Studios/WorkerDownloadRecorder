@@ -22,10 +22,11 @@ async function cron(env, sendMsg) {
 		const value = await KV1.get(name);
 		if (!name || name == 'total' || name.toString().includes('%2F') || name.toString().includes('%3F') || name.toString().includes('%3D')) {
 			if (!name) {
+				console.log('Invalid Repo, skipping');
 			} else {
 				await KV1.delete(name);
+				console.log('Invalid Repo, deleting');
 			}
-			console.log('Invalid Repo, skipping');
 		} else {
 			repos.push({ name, count: parseInt(value) });
 			Dtotal += parseInt(value); //calc total downloads
