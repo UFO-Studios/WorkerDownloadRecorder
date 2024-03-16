@@ -54,60 +54,60 @@ async function cron(env, sendMsg) {
 			.map(
 				(repo) => `Repo: ${repo.name}, Count: ${repo.count}
 `
-			)
-			.join('');
-	var message1 = message1 + '\n\nTotal downloads: ' + Dtotal;
-	var message2 =
-		'# Page visits as of ' +
-		currentDate.toUTCString() +
-		'\n\n' +
-		pages
-			.map(
-				(page) => `Page: ${page.name}, Count: ${page.count}
+      )
+      .join('');
+  var message1 = message1 + '\n\nTotal downloads: ' + Dtotal;
+  var message2 =
+    '# Page visits as of ' +
+    currentDate.toUTCString() +
+    '\n\n' +
+    pages
+      .map(
+        (page) => `Page: ${page.name}, Count: ${page.count}
 `
-			)
-			.join('');
-	var message = message2 + '\n\nTotal page visits: ' + Ptotal;
-	console.log('Message generated. Sending to Discord...');
-	console.log(message);
-	if (sendMsg == false) {
-		console.log('Sending data to ' + env.url);
-		//split messages to avoid limit
-		await fetch(env.url, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				content: message1,
-			}),
-		})
-			.then((response) => {
-				console.log('Status:', response.status);
-			})
-			.then((body) => console.log('Body:', body))
-			.catch((error) => console.error(error));
-		await fetch(env.url, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				content: message2,
-			}),
-		})
-			.then((response) => {
-				console.log('Status:', response.status);
-				// return response.text();
-			})
-			.then((body) => console.log('Body:', body))
-			.catch((error) => console.error(error));
-		console.log('Message sent to Discord');
-		return 'Complete! Message sent.';
-	} else {
-		console.log('Returning mesage');
-		return message1 + '\n\n' + message2;
-	}
+      )
+      .join('');
+  var message = message2 + '\n\nTotal page visits: ' + Ptotal;
+  console.log('Message generated. Sending to Discord...');
+  console.log(message);
+  if (sendMsg == false) {
+    console.log('Sending data to ' + env.url);
+    //split messages to avoid limit
+    await fetch(env.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content: message1,
+      }),
+    })
+      .then((response) => {
+        console.log('Status:', response.status);
+      })
+      .then((body) => console.log('Body:', body))
+      .catch((error) => console.error(error));
+    await fetch(env.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content: message2,
+      }),
+    })
+      .then((response) => {
+        console.log('Status:', response.status);
+        // return response.text();
+      })
+      .then((body) => console.log('Body:', body))
+      .catch((error) => console.error(error));
+    console.log('Message sent to Discord');
+    return 'Complete! Message sent.';
+  } else {
+    console.log('Returning mesage');
+    return message1 + '\n\n' + message2;
+  }
 }
 async function recordDownload(url, env) {
 	console.log('Recording download');
@@ -149,64 +149,70 @@ async function recordDownload(url, env) {
 	);
 }
 async function recordVisit(url, env) {
-	let page = url.split('?page=')[1];
-	if (page == void 0) {
-		return new Response('No page specified', { status: 400 });
-	}
-	let count = await env.WVR.get(page);
-	if (count == null) {
-		count = 0;
-	}
-	count++;
-	await env.WVR.put(page, count);
-	return new Response('OK', { status: 200 });
+  let page = url.split('?page=')[1];
+  if (page == void 0) {
+    return new Response('No page specified', { status: 400 });
+  }
+  let count = await env.WVR.get(page);
+  if (count == null) {
+    count = 0;
+  }
+  count++;
+  await env.WVR.put(page, count);
+  return new Response('OK', { status: 200 });
 }
 var worker_default = {
-	/**
-	 * Incoming requests will trigger this method.
-	 * Decides what to do with the request (download, page view or invalid request)
-	 */
-	async fetch(request, env, ctx) {
-		console.log('Worker is running...');
-		var url = new URL(request.url).toString();
-		// Replace encoded characters
-		url = url.replace('%2F', '/');
-		url = url.replace('%3F', '?');
-		url = url.replace('%3D', '=');
-		console.log('Processing request for ' + url);
+  /**
+   * Incoming requests will trigger this method.
+   * Decides what to do with the request (download, page view or invalid request)
+   */
+  async fetch(request, env, ctx) {
+    console.log('Worker is running...');
+    var url = new URL(request.url).toString();
+    // Replace encoded characters
+    url = url.replace('%2F', '/');
+    url = url.replace('%3F', '?');
+    url = url.replace('%3D', '=');
+    console.log('Processing request for ' + url);
 
-		// Check if the request is for a download, page view or invalid
-		if (url.includes('test/cron')) {
-			//Run cron tests manually, used for debug
-			return new Response(await cron(env, true, false));
-		}
-		if (url.includes('favicon.ico')) {
-			//Ignore favicon requests
-			return new Response(null, { status: 404 });
-		}
-		if (!url) {
-			//Ignore empty requests
-			console.log('Invalid request, redirecting to 404');
-			return Response.redirect('https://thealiendoctor.com/404', 301);
-		}
-		if (url.includes('/reder?url=')) {
-			//Download req
-			console.log('Request is for a download.');
-			return await recordDownload(request.url, env);
-		} else if (url.includes('?page=')) {
-			//Page view req
-			console.log('Request is for a page.');
-			return await recordVisit(url, env);
-		} else {
-			//Invalid req
-			console.log('Invalid request, redirecting to 404');
-			return Response.redirect('https://thealiendoctor.com/404', 301);
-		}
-	},
-	async scheduled(event, env, ctx) {
-		console.log('Scheduled event is running...');
-		ctx.waitUntil(await cron(env, false));
-	},
+    // Check if the request is for a download, page view or invalid
+    if (url.includes('test/cron')) {
+      //Run cron tests manually, used for debug
+      return new Response(await cron(env, true, false));
+    } else if (url.includes('favicon.ico')) {
+      //Ignore favicon requests
+      return new Response(null, { status: 404 });
+    } else if (url.includes('robots.txt')) {
+      //Ignore robots.txt requests
+      return new Response('User-agent: *\nDisallow: /', {
+        headers: {
+          'content-type': 'text/plain',
+        },
+      });
+    }
+    if (!url) {
+      //Ignore empty requests
+      console.log('Invalid request, redirecting to 404');
+      return Response.redirect('https://thealiendoctor.com/404', 301);
+    }
+    if (url.includes('/reder?url=')) {
+      //Download req
+      console.log('Request is for a download.');
+      return await recordDownload(request.url, env);
+    } else if (url.includes('?page=')) {
+      //Page view req
+      console.log('Request is for a page.');
+      return await recordVisit(url, env);
+    } else {
+      //Invalid req
+      console.log('Invalid request, redirecting to 404');
+      return Response.redirect('https://thealiendoctor.com/404', 301);
+    }
+  },
+  async scheduled(event, env, ctx) {
+    console.log('Scheduled event is running...');
+    ctx.waitUntil(await cron(env, false));
+  },
 };
 export { worker_default as default };
 //# sourceMappingURL=worker.js.map
