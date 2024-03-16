@@ -20,7 +20,7 @@ async function cron(env, sendMsg) {
 		i++;
 		console.log(`Getting value for ${name} (${i}/${len})`);
 		const value = await KV1.get(name);
-		if (!name || name == 'total') {
+		if (!name || name == 'total' || name.toString().includes('%2F') || name.toString().includes('%3F') || name.toString().includes('%3D')) {
 			console.log('Invalid Repo, skipping');
 		} else {
 			repos.push({ name, count: parseInt(value) });
@@ -118,7 +118,7 @@ async function recordDownload(url, env) {
 	const packNameRaw = urltmp.toString().split('/reder?url=')[1];
 	const fileName = urltmp.toString().split('?file=')[1];
 	var packName = packNameRaw.split('?file=')[0];
-	if (!packName) {
+	if (!packName || !fileName) {
 		console.log('Invalid request, redirecting to 404');
 		return Response.redirect('https://thealiendoctor.com/404', 301);
 	}
