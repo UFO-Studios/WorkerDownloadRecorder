@@ -172,7 +172,12 @@ async function cron(env, sendMsg) {
 		  console.log("Request is for a page.");
 		  return await recordVisit(url, env);
 		  case url.includes("stats.thealiendoctor.com"):
+			let headers = new Headers()
+			if (headers.get("X-AW2C-AUTH") == env.auth) {
 			return new Response(await cron(env, true));
+			} else {
+				return new Response("Unauthorized", { status: 401 });
+			}
 		default:
 		  console.log("Invalid request, redirecting to 404");
 		  return Response.redirect("https://thealiendoctor.com/404", 301);
