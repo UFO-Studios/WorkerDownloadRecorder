@@ -1,4 +1,4 @@
-import { chart } from "./scheduled/chart";
+import { chart } from "./chart";
 
 /**
  * Sends the weekly totals to a discord channel.
@@ -86,7 +86,7 @@ export async function cron(env) {
  * @param {object} env The ENV object.
  * @returns
  */
-async function sendMessageToDiscord(message, env) {
+export async function sendMessageToDiscord(message, env) {
 	await fetch(env.url, {
 		method: 'POST',
 		headers: {

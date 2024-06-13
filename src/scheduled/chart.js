@@ -1,4 +1,4 @@
-import sendMessageToDiscord from "./weeklyMessage.js";
+import { sendMessageToDiscord } from "./weeklyMessage.js";
 
 /**
  * Creates a chart of the hightest 5 repos and sends it to the discord channel.
