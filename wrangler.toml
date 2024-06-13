@@ -19,11 +19,10 @@ mode = "smart"
 [triggers]
 crons = [ "0 12 * * sat" ]
 
-# [unsafe]
-#   [[unsafe.bindings]]
-#   database_id = "eafc6a3b-97a7-4c08-94d9-7a10d4c28cb0"
-#   name = "DB"
-#   type = "d1"
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "DownloadArchive"
+database_id = "34a375cc-9ec7-4244-9368-b63c71fa9218"
 
 [vars]
 url = "https://discord.com/api/webhooks/1156259064595087521/fLfxylc8D6oe15-ZsnTxhpjwUkmjUIXM08ncj0GYV2pX3yykMM3hMZgbRn36qsvhd9FG"

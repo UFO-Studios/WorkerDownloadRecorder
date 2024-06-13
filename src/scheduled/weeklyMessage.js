@@ -1,4 +1,5 @@
 import { chart } from "./chart";
+import archiveData from "./db";
 
 /**
  * Sends the weekly totals to a discord channel.
@@ -43,6 +44,7 @@ export async function cron(env) {
 			Dtotal += parseInt(value);
 		}
 	}
+
 	repos.sort((a, b) => b.count - a.count);
 	const Plist = await KV2.list();
 	console.log('Key list aquired for pages');
@@ -63,19 +65,27 @@ export async function cron(env) {
 	pages.sort((a, b) => b.count - a.count);
 	let currentDate = /* @__PURE__ */ new Date();
 
-	var downloadMessageRaw = repos.map((repo) => `Repo: ${repo.name}, Count: ${repo.count}`).join('');
+	//create repo and count arrays
+	var repoArr = [];
+	var countArr = [];
+	for (var i = 0; i < repos.length; i++) {
+		repoArr.push(repos[i].name);
+		countArr.push(repos[i].count);
+	}
+	await archiveData(env, repoArr, countArr);
+	var downloadMessageRaw = repos.map((repo) => `Repo: ${repo.name}, Count: ${repo.count}\n`).join('');
 	var downloadMessage = '# Downloads as of ' + currentDate.toUTCString() + '\n\n' + downloadMessageRaw + '\n\nTotal downloads: ' + Dtotal;
-	var pageViewMessage = '# Page visits as of ' + currentDate.toUTCString() + '\n\n' + pages.map((page) => `Page: ${page.name}, Count: ${page.count}`).join('');
+	var pageViewMessage = '# Page visits as of ' + currentDate.toUTCString() + '\n\n' + pages.map((page) => `Page: ${page.name}, Count: ${page.count}\n`).join('');
 	let pageViewMessage_1 = pageViewMessage.substring(0, 1999);
 	let pageViewMessage_2 = pageViewMessage.substring(2e3);
 	console.log('Message generated. Sending to Discord...');
 		console.log('Sending data to ' + env.url);
 		await sendMessageToDiscord(downloadMessage, env);
 		await sendMessageToDiscord(pageViewMessage_1, env);
-		await chart(downloadMessageRaw);
 		if (pageViewMessage_2.length > 0) {
 			await sendMessageToDiscord(pageViewMessage_2, env);
 		}
+		await chart(downloadMessageRaw);
 		console.log('Message sent to Discord');
 		return 'Complete! Message sent.';
 }
