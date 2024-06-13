@@ -44,23 +44,15 @@ async function recordDownload(url, env) {
 }
 async function recordVisit(url, env) {
 	let page = url.split('?page=')[1];
-}
-async function recordVisit(url, env) {
-	let page = url.split('?page=')[1];
 	if (page == void 0) {
-		return new Response('No page specified', { status: 400 });
 		return new Response('No page specified', { status: 400 });
 	}
 	let count = await env.WVR.get(page);
 	if (count == null) {
 		count = 0;
-		count = 0;
 	}
 	count++;
 	await env.WVR.put(page, count);
-	return new Response('OK', { status: 200 });
-}
-var worker_default = {
 	return new Response('OK', { status: 200 });
 }
 var worker_default = {
@@ -96,13 +88,6 @@ var worker_default = {
 		}
 	},
 	async scheduled(event, env, ctx) {
-		console.log('Scheduled event is running...');
-		ctx.waitUntil(await cron(env, false));
-		console.log('Scheduled event completed');
-	},
-};
-export { worker_default as default };
-//# sourceMappingURL=worker.js.map
 		console.log('Scheduled event is running...');
 		ctx.waitUntil(await cron(env, false));
 		console.log('Scheduled event completed');
