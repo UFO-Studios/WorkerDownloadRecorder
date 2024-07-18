@@ -26,7 +26,7 @@ async function recordDownload(url, env) {
 		console.log('Found in KV');
 		var newCount = oldNum++;
 		await KV.put(packName, newCount);
-		console.log(packName + ' now has ' + newCount + ' downloads');
+		console.log(packName + ' now has ' + newCount + ' downloads (had ' + oldNum + ')');
 	}
 
 	//Redirect the user to the download link
